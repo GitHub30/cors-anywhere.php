@@ -1,6 +1,6 @@
 # cors-anywhere.php
 
-```
+```bash
 curl https://xs679698.xsrv.jp/https://httpbin.org/get?foo=bar
 
 curl https://xs679698.xsrv.jp/https://httpbin.org/post?foo=bar -d "param1=abc&param2=xyz"
