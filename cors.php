@@ -20,6 +20,7 @@ $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+curl_setopt($ch, CURLOPT_HEADER, true);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     $body = file_get_contents('php://input');
@@ -48,6 +49,13 @@ if (curl_errno($ch)) {
 }
 
 $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 curl_close($ch);
-header('HTTP/1.1 ' . $http_status);
-echo $response;
+
+$headers = explode("\r\n", substr($response, 0, $header_size));
+foreach ($headers as $header) {
+    $header = preg_replace("/^HTTP\/\S+/", $_SERVER['SERVER_PROTOCOL'], $header);
+    header($header, false);
+}
+
+echo substr($response, $header_size);
