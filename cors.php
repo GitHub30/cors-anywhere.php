@@ -52,8 +52,17 @@ $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 curl_close($ch);
 
+$skipPattern = "/^(?i)(transfer-encoding|content-length|connection|keep-alive|proxy-authenticate|proxy-authorization|te|trailer|upgrade):/";
+
 $headers = explode("\r\n", substr($response, 0, $header_size));
 foreach ($headers as $header) {
+    if (trim($header) === '') {
+        continue;
+    }
+    // スキップ対象ヘッダーならスキップ
+    if (preg_match($skipPattern, trim($header))) {
+        continue;
+    }
     $header = preg_replace("/^HTTP\/\S+/", $_SERVER['SERVER_PROTOCOL'], $header);
     header($header, false);
 }
